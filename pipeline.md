@@ -29,7 +29,7 @@ docs/
 Для текущего выпуска в PowerShell:
 
 ```powershell
-git clone --branch v1.0.1 --depth 1 ssh://git@gl.rnd.lanit.ru:2222/DEV/standards/frontend.git frontend-standard-v1
+git clone --branch v1.0.2 --depth 1 ssh://git@gl.rnd.lanit.ru:2222/DEV/standards/frontend.git frontend-standard-v1
 ```
 
 Работа с тегом даёт фиксированную редакцию. Для знакомства можно клонировать default branch, но при принятии стандарт закрепляется конкретным выпуском. Обновление общей ветки не меняет требования уже подключённых проектов.
@@ -46,39 +46,37 @@ git clone --branch v1.0.1 --depth 1 ssh://git@gl.rnd.lanit.ru:2222/DEV/standards
 
 Рядом доступны `standard/`, `templates/` и этот pipeline. Такое чтение не делает skill автоматически обнаруживаемым другими сессиями.
 
-### Вариант B: установить в проект для Codex
+### Вариант B: установить одной командой
 
-Выполнить из корня целевого проекта; заменить только путь к checkout стандартов:
+Требуется Python 3.9+; дополнительные пакеты не нужны. Команды одинаковы для Windows, Linux и macOS.
 
-```powershell
-$standardCheckout = (Resolve-Path 'D:\path\frontend-standard-v1').Path
-$skillTarget = Join-Path (Get-Location).Path '.agents/skills/frontend-standard'
-if (Test-Path -LiteralPath $skillTarget) {
-    throw 'Skill уже установлен. Сначала сравните версии; не перезаписывайте локальные изменения.'
-}
-New-Item -ItemType Directory -Path $skillTarget -Force | Out-Null
-Copy-Item -LiteralPath (Join-Path $standardCheckout 'skills/frontend-standard/SKILL.md') -Destination $skillTarget
-Copy-Item -LiteralPath (Join-Path $standardCheckout 'skills/frontend-standard/agents') -Destination $skillTarget -Recurse
-$skillReferences = Join-Path $skillTarget 'references'
-New-Item -ItemType Directory -Path $skillReferences | Out-Null
-Copy-Item -LiteralPath (Join-Path $standardCheckout 'standard') -Destination $skillReferences -Recurse
-Copy-Item -LiteralPath (Join-Path $standardCheckout 'templates') -Destination $skillReferences -Recurse
-Copy-Item -LiteralPath (Join-Path $standardCheckout 'pipeline.md') -Destination $skillReferences
+**Для пользователя — из каталога клонированного репозитория:**
+
+```shell
+python install.py --user
 ```
 
-Результат самодостаточен:
+Skill будет доступен в разных проектах. Установщик использует каталог `skills` внутри `CODEX_HOME`, а если переменная не задана — `~/.codex/skills`.
 
-```text
-.agents/skills/frontend-standard/
-  SKILL.md
-  agents/openai.yaml
-  references/
-    standard/{VERSION,frontend.md}
-    templates/{AGENTS.frontend.md,adoption.md,audit.md,modernization.md}
-    pipeline.md
+**Только для одного проекта — из каталога клонированного репозитория:**
+
+```shell
+python install.py --project /путь/к/проекту
 ```
 
-Для личной установки в Codex можно вместо проектного пути использовать каталог `frontend-standard` внутри своего каталога skills. Местоположение зависит от окружения агента; инструкция не требует конкретного профиля Windows. После установки начните новую сессию/обновите список skills и проверьте, что доступен `frontend-standard`. Если агент его не обнаружил, используйте прямой путь к SKILL.md и отдельно разберитесь с регистрацией.
+На Windows, например: `python install.py --project "D:\\Projects\\my-app"`.
+
+**Из корня целевого проекта**, если репозиторий стандартов лежит рядом:
+
+```shell
+python ../frontend-standard-v1/install.py --project .
+```
+
+Установщик сам собирает skill со стандартом, шаблонами и инструкцией в `.agents/skills/frontend-standard`. Исходный checkout после установки для работы skill не нужен. Он не изменяет AGENTS.md, код приложения и принятую проектом версию стандарта.
+
+Если skill уже существует, установщик завершится с понятным сообщением и сохранит файлы. Автоматического обновления поверх локальных изменений нет: сравнение и обновление установленной копии — отдельная задача.
+
+После установки начните новую сессию агента и вызовите `$frontend-standard`. Если skill не обнаружен, можно передать прямой путь к установленному SKILL.md.
 
 Внутри опубликованного исходного репозитория эталон один — `standard/`. Копии в установленном skill являются пакетом выбранного выпуска; вручную отдельно их не редактируют. При работе с уже подключённым проектом приоритет имеет его принятая версия, даже если skill поставляется с более новой.
 
