@@ -4,7 +4,7 @@
 
 У каждого элемента своя задача:
 
-- [Стандарт](standard/frontend.md) и [темы](standard/themes.md) определяют требования.
+- [Единый стандарт](standard/frontend.md) определяет требования, включая механизм тем.
 - Skill `frontend-standard` задаёт процедуру нового проекта, аудита и модернизации.
 - Блок в `AGENTS.md` закрепляет требования для дальнейших задач.
 - Проверки подтверждают результат; наличие файлов само по себе не доказывает соответствие.
@@ -17,7 +17,6 @@ docs/
   standards/frontend/
     VERSION
     frontend.md
-    themes.md
     adoption.md
   frontend-audit.md           # После аудита
   frontend-modernization.md   # Когда требуется план работ
@@ -27,10 +26,10 @@ docs/
 
 ## 2. Получение выбранной редакции
 
-Для первого выпуска в PowerShell:
+Для текущего выпуска в PowerShell:
 
 ```powershell
-git clone --branch v1.0.0 --depth 1 ssh://git@gl.rnd.lanit.ru:2222/DEV/standards/frontend.git frontend-standard-v1
+git clone --branch v1.0.1 --depth 1 ssh://git@gl.rnd.lanit.ru:2222/DEV/standards/frontend.git frontend-standard-v1
 ```
 
 Работа с тегом даёт фиксированную редакцию. Для знакомства можно клонировать default branch, но при принятии стандарт закрепляется конкретным выпуском. Обновление общей ветки не меняет требования уже подключённых проектов.
@@ -74,7 +73,7 @@ Copy-Item -LiteralPath (Join-Path $standardCheckout 'pipeline.md') -Destination 
   SKILL.md
   agents/openai.yaml
   references/
-    standard/{VERSION,frontend.md,themes.md}
+    standard/{VERSION,frontend.md}
     templates/{AGENTS.frontend.md,adoption.md,audit.md,modernization.md}
     pipeline.md
 ```
